@@ -156,10 +156,3 @@ function print() {
                 break;            
     }
 }
-
-/**
- * https://github.com/ULL-ESIT-INF-DSI-2021/ull-esit-inf-dsi-20-21-prct09-async-fs-process-alu0101216775
- * https://ull-esit-inf-dsi-2021.github.io/ull-esit-inf-dsi-20-21-prct08-filesystem-notes-app-alu0101216775/
- * https://github.com/AdrianGlez18/VanillaJS-Task-Manager/blob/main/src/main.js
- * https://github.com/ULL-ESIT-INF-DSI-2021/ull-esit-inf-dsi-20-21-prct09-async-fs-process-alu0101206479/blob/master/src/ejercicio-1.ts ****
- */
