@@ -7,7 +7,7 @@ function watchUserNotes(user: string, path: string) {
         if(err) {
             console.error(chalk.red("It was not possible to access to the user directory. Maybe it does not exist."));
         } else {
-            let noteModified: boolean = true;
+            let noteModified: boolean = true, noteAdded: boolean = false;
             var fsTimeout: unknown = setTimeout(function() { fsTimeout=null }, 1000);
             if(fs.lstatSync(path).isDirectory()) {
                 fs.readdir(path, (err, listOfFiles) => {
@@ -15,6 +15,7 @@ function watchUserNotes(user: string, path: string) {
                         console.error(chalk.red("It was not possible to read to the user directory. Maybe it does not have permissions."));
                     } else {
                         fs.watch(path, (typeOfEvent, filename) => {
+                            if(!noteAdded) noteModified = true;
                             fs.readdir(path, (err, newListOfFiles) => {
                                 if(err) {
                                     console.error(chalk.red("Something changed in the directory. It is not possible to read it now."));
@@ -22,13 +23,13 @@ function watchUserNotes(user: string, path: string) {
                                     if(typeOfEvent == "rename") {
                                         if(listOfFiles.length < newListOfFiles.length) {
                                             console.log(chalk.green(`New file added! File name is ${filename}`));
-                                            noteModified = false;
+                                            noteAdded = true;
                                         } else if(listOfFiles.length > newListOfFiles.length) {
                                             console.log(chalk.green(`File removed! File name was ${filename}`));
                                         }
                                         listOfFiles = newListOfFiles;
-                                    }
-                                    if(typeOfEvent == "change") {
+                                    } else if(typeOfEvent == "change") {
+                                        if(noteAdded) {noteAdded = !noteAdded; noteModified = false;}
                                         if(!fsTimeout && noteModified) {
                                             console.log(chalk.green(`File modified! File name is ${filename}`));
                                             /**
@@ -39,7 +40,6 @@ function watchUserNotes(user: string, path: string) {
                                             fsTimeout = setTimeout(function() { fsTimeout=null }, 1000);
                                         }
                                     }
-                                    noteModified = true;
                                 }
                             })
                         })
