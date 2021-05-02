@@ -2,6 +2,10 @@ import * as yargs from 'yargs';
 
 import {fileSystemWorkflowHandler} from './fileSystemWorkflowHandler'
 
+/**
+ * Procesa los parámetros recibidos
+ * @param workflow 
+ */
 export function InitializeYargsCommands(workflow : fileSystemWorkflowHandler): void {
     yargs.command({
         command: 'ls',

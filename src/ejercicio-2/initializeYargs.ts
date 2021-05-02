@@ -5,6 +5,10 @@ import * as chalk from 'chalk';
 
 import {countWithPipe, countWithoutPipe} from './countFunctions'
 
+/**
+ * Procesa los parámetros recibidos
+ * @param workflow 
+ */
 export function InitializeYargsCommands(): void {
     yargs.command({
         command: 'count',

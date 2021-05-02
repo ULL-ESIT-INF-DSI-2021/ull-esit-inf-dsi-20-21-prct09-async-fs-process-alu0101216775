@@ -2,6 +2,11 @@ import * as fs from 'fs'
 import * as yargs from 'yargs'
 import * as chalk from 'chalk'
 
+/**
+ * Observa os cambios producidos al directorio de un determinado usuario
+ * @param user 
+ * @param path 
+ */
 function watchUserNotes(user: string, path: string) {
     fs.access(path, (err) => {
         if(err) {

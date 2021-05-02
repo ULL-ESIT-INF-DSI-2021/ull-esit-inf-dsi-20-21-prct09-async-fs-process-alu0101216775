@@ -3,8 +3,15 @@ import {spawn} from 'child_process';
 import * as chalk from 'chalk';
 import * as fs from 'fs'
 
+/**
+ * Clase encargada de controlar el flujo de trabajo sobre el sistema de archivos
+ */
 export class fileSystemWorkflowHandler {
     constructor() {};
+    /**
+     * Comando ls: Muestra archivos de un directorio
+     * @param path 
+     */
     ls(path: string) {
         try {
             let files: string[] = [];
@@ -22,6 +29,10 @@ export class fileSystemWorkflowHandler {
         }
     }
     
+    /**
+     * Crea un nuevo directorio, si no existe
+     * @param path 
+     */
     mkdir(path: string) {
         if (!fs.existsSync(path)){
             fs.mkdirSync(path);
@@ -32,6 +43,10 @@ export class fileSystemWorkflowHandler {
         }
     }
 
+    /**
+     * Muestra el contenido de un fichero
+     * @param path 
+     */
     cat(path: string) {
         if (fs.existsSync(path)){
             if(fs.lstatSync(path).isDirectory()) {
@@ -53,6 +68,10 @@ export class fileSystemWorkflowHandler {
         }
     }
 
+    /**
+     * Elimina un fichero/directorio
+     * @param path 
+     */
     rm(path: string) {
         if (fs.existsSync(path)){
             const rm = spawn('rm', ['-rf', path]);
@@ -69,6 +88,13 @@ export class fileSystemWorkflowHandler {
         }
     }
 
+    /**
+     * Copia/mueve un fichero/directorio
+     * @param src ruta de origen
+     * @param dst ruta de destino
+     * @param overwrite sobreescribir si destino ya existe
+     * @param move Mover en lugar de copiar
+     */
     async copy(src: string, dst: string, overwrite: boolean, move: boolean) {
         if (fs.existsSync(src)) {
             if(overwrite) {
