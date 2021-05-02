@@ -5,36 +5,26 @@
 ### Fecha de entrega: 1/05/2021
 
 * * *
-<h2 align="center">Estado de pruebas y cubrimiento</h2>
+<h2 align="center">Estado de sonarcloud</h2>
 
 <p align="center">
-    <a href="https://github.com/ULL-ESIT-INF-DSI-2021/ull-esit-inf-dsi-20-21-prct08-filesystem-notes-app-alu0101216775/actions/workflows/node.js.yml">
-        <img alt="Github Actions CI" src="https://github.com/ULL-ESIT-INF-DSI-2021/ull-esit-inf-dsi-20-21-prct08-filesystem-notes-app-alu0101216775/actions/workflows/node.js.yml/badge.svg">
+    <a href="https://sonarcloud.io/dashboard?id=ULL-ESIT-INF-DSI-2021_ull-esit-inf-dsi-20-21-prct09-async-fs-process-alu0101216775">
+        <img alt="SonarCloud Quality Gate" src="https://sonarcloud.io/api/project_badges/measure?project=ULL-ESIT-INF-DSI-2021_ull-esit-inf-dsi-20-21-prct09-async-fs-process-alu0101216775&metric=security_rating">
     </a>
-    <a href="https://coveralls.io/github/ULL-ESIT-INF-DSI-2021/ull-esit-inf-dsi-20-21-prct08-filesystem-notes-app-alu0101216775?branch=main">
-        <img alt="Coverage" src="https://coveralls.io/repos/github/ULL-ESIT-INF-DSI-2021/ull-esit-inf-dsi-20-21-prct08-filesystem-notes-app-alu0101216775/badge.svg?branch=main">
-    </a>
-    <a href="https://sonarcloud.io/dashboard?id=ULL-ESIT-INF-DSI-2021_ull-esit-inf-dsi-20-21-prct08-filesystem-notes-app-alu0101216775">
-        <img alt="SonarCloud Quality Gate" src="https://sonarcloud.io/api/project_badges/measure?project=ULL-ESIT-INF-DSI-2021_ull-esit-inf-dsi-20-21-prct08-filesystem-notes-app-alu0101216775&metric=alert_status">
-    </a>
-    <a href="https://sonarcloud.io/dashboard?id=ULL-ESIT-INF-DSI-2021_ull-esit-inf-dsi-20-21-prct08-filesystem-notes-app-alu0101216775">
-        <img alt="SonarCloud Quality Gate" src="https://sonarcloud.io/api/project_badges/measure?project=ULL-ESIT-INF-DSI-2021_ull-esit-inf-dsi-20-21-prct08-filesystem-notes-app-alu0101216775&metric=sqale_rating">
-    </a>
-    <a href="https://sonarcloud.io/dashboard?id=ULL-ESIT-INF-DSI-2021_ull-esit-inf-dsi-20-21-prct08-filesystem-notes-app-alu0101216775">
-        <img alt="SonarCloud Quality Gate" src="https://sonarcloud.io/api/project_badges/measure?project=ULL-ESIT-INF-DSI-2021_ull-esit-inf-dsi-20-21-prct08-filesystem-notes-app-alu0101216775&metric=security_rating">
+    <a href="https://sonarcloud.io/dashboard?id=ULL-ESIT-INF-DSI-2021_ull-esit-inf-dsi-20-21-prct09-async-fs-process-alu0101216775">
+        <img alt="SonarCloud Quality Gate" src="https://sonarcloud.io/api/project_badges/measure?project=ULL-ESIT-INF-DSI-2021_ull-esit-inf-dsi-20-21-prct09-async-fs-process-alu0101216775&metric=sqale_rating">
     </a>
 </p>
 
 ## Introducción
-Esta práctica tiene la finalidad de familiarizarse con el entorno de desarrollo de Node. Se busca crear un sistema de gestión de notas, haciendo uso de los paquetes **yargs** y **chalk**. Se seguirá una metodología TDD, se usarán github actions y se documentará el código con typedoc.
-
+Esta práctica tiene la finalidad de familiarizarse con el entorno de desarrollo de Node, la librería de ficheros fs y la API de procesos, especialmente spawn.
 ## Objetivos
 * Familiarizarse con el entorno de desarrollo Node
 * Mejorar el desarrollo con Typescript
-* Realizar pruebas con TDD y medir el cubrimiento con Coveralls
-* Usar los paquetes yargs y chalk
+* Controlar procesos con la API
+* Usar el sistema de ficheros
+* Usar el paquete yargs
 * Generar documentación con typedoc
-* Lanzar github actions
 * Generar informe en Github Pages
 
 * * *
