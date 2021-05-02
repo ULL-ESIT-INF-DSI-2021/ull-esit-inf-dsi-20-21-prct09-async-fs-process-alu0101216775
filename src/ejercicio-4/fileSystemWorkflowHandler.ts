@@ -35,7 +35,7 @@ export class fileSystemWorkflowHandler {
     cat(path: string) {
         if (fs.existsSync(path)){
             if(fs.lstatSync(path).isDirectory()) {
-                console.log(chalk.red("The path contains a directory, not a file. ls will be executed instead."));
+                console.error(chalk.red("The path contains a directory, not a file. ls will be executed instead."));
                 this.ls(path);
             }
             else {
@@ -76,7 +76,10 @@ export class fileSystemWorkflowHandler {
                     if(err) {
                         console.error(chalk.red("Something went wrong. It was not possible to copy source path."));
                     }
-                    console.log(chalk.green("File copied successfully!"))
+                    else {
+                        console.log(chalk.green("File copied successfully!"));
+                        if(move) this.rm(src);
+                    }             
                 });
             }
             else {
@@ -85,15 +88,15 @@ export class fileSystemWorkflowHandler {
                         if(err) {
                             console.error(chalk.red("Something went wrong. It was not possible to copy source path."));
                         }
-                        console.log(chalk.green("File copied successfully!"))
+                        else {
+                            console.log(chalk.green("File copied successfully!"));
+                            if(move) this.rm(src);
+                        }
                     });
                 }
                 else {
                     console.error(chalk.red("Destination path already exists! If you want to overwirte it, you must specify --overwrite option."));
                 }
-            }
-            if(move) {
-                this.rm(src);
             }
         } else {
             console.error(chalk.red("The source path does not exist."));
