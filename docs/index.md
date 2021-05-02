@@ -1,8 +1,8 @@
 # Desarrollo de Sistemas Informáticos 
-## Práctica 8: Aplicación de procesamiento de notas de texto
+## Práctica 9: Sistema de ficheros y creación de procesos en Node.js Tarea
 ### Autor: Adrián González Hernández
 ### Email: alu0101216775@ull.edu.es
-### Fecha de entrega: 25/04/2021
+### Fecha de entrega: 1/05/2021
 
 * * *
 <h2 align="center">Estado de pruebas y cubrimiento</h2>
@@ -39,126 +39,174 @@ Esta práctica tiene la finalidad de familiarizarse con el entorno de desarrollo
 
 * * *
 
-## El programa principal index.ts
-El archivo index.ts es el encargado de ejecutar el programa. Genera un objeto de gestión del flujo de trabajo, y se lo manda como argumento a la función encargada de procesar los argumentos con yargs. Su código es únicamente el siguiente:
+## Ejercicio 1
+
+El primer ejercicio solicitaba realizar una traza del siguiente código:
 
 ```typescript
-import {ProgramFlowHandler} from './ProgramFlowHandler'
-import {InitializeYargsCommands} from './initializeYargs'
+import {access, constants, watch} from 'fs';
 
-let workflow: ProgramFlowHandler = new ProgramFlowHandler();
-InitializeYargsCommands(workflow);
-```
+if (process.argv.length !== 3) {
+  console.log('Please, specify a file');
+} else {
+  const filename = process.argv[2];
 
-* * *
+  access(filename, constants.F_OK, (err) => {
+    if (err) {
+      console.log(`File ${filename} does not exist`);
+    } else {
+      console.log(`Starting to watch file ${filename}`);
 
-## La función InitializeYargsCommands
+      const watcher = watch(process.argv[2]);
 
-Documentación de typedoc accesible desde [aquí.](typedoc/modules/initializeyargs.html)
+      watcher.on('change', () => {
+        console.log(`File ${filename} has been modified somehow`);
+      });
 
-Esta función se encuentra en el archivo initializeYargs.ts. Se encarga de procesar los argumentos de entrada haciendo uso del paquete **yargs**.
-Para este proyecto se han desarrollado un total de 5 comandos:
-
-* add: Añade una nueva nota, si no existe
-* remove: Elimina una de las notas
-* Modify: Permite modificar uno o más campos de una nota
-* List: Muestra todas las notas de un usuario concreto
-* Read: Permite leer una nota
-
-Cada uno de estos comandos recibe una serie de parámetros, que pueden ser obligatorios (título de la nota, usuario...) o no.
-Para cada comando, la función se encarga de procesarlos y enviarlos de la forma más adecuada al controlador del sistema de ficheros. Esto se divide así para evitar que una misma función se encargue tanto de procesar argumentos como de la entrada y salida al sistema de archivos.
-
-Un ejemplo de procesamiento de un comando es el siguiente:
-
-```typescript
-//Comando LIST: Usado para mostrar todas las notas de un usuario
-yargs.command({
-command: 'list',
-describe: 'List user notes',
-builder: {
-    user: {
-    describe: 'User who owns the notes',
-    demandOption: true,
-    type: 'string',
-    },
-},
-handler(argv) {
-    //Comprueba que el argumento requerido sea del tipo correcto
-    if (typeof argv.user === 'string') {
-    //Intenta mostrar las notas del usuario desde el gestor del flujo de trabajo
-    workflow.listNotes(argv.user);
+      console.log(`File ${filename} is no longer watched`);
     }
-},
-}),
+  });
+}
 ```
 
-Este comando, llamado list, marcado como obligatorio(demandOption: true), gestiona en el handler si el tipo del argumento es el correcto. Si es así, lo manda al workfow, que es un objeto de la clase _ProgramFlowHandler_.
+Para ello, se ha desarrollado una pequeña webapp haciendo uso de javascript y un documento HTML, mostrando las diferentes iteraciones hasta completar la traza.
+Puede acceder a dicha traza [aquí](https://ull-esit-inf-dsi-2021.github.io/ull-esit-inf-dsi-20-21-prct09-async-fs-process-alu0101216775/traza), o consultar los ficheros individualmente en __docs/traza__ en el repositorio de github.
 
 * * *
 
-## Clase ProgramFlowHandler
+## Ejercicio 2
 
-Documentación de typedoc accesible desde [aquí.](typedoc/modules/programflowhandler.html)
+Este ejercicio pide crear un programa capaz de contar las líneas, palabras o caracteres de un fichero de texto, usando fs.
 
-Esta clase se encarga de gestionar las lecturas y escrituras al sistema de archivos, y notificar los errores que detecten estos procedimientos.
-Para ello, la clase tiene las siguientes funciones:
+El directorio del ejercicio contiene lo siguiente:
 
-* addNote(note: Note): Añade la nota recibida por parámetro al sistema de archivos. Comprueba que no exista, y si es necesario, genera el directorio de usuario para almacenarlo.
-* deleteNote(note: string): Elimina la nota de la ruta pasada por parámetro, si ya existe. Gestiona los errores también.
-* modifyNote(note: string, ntitle: string, nbody: string, ncolor: string): Modifica una nota, siempre y cuando exista y reciba algún parámetro a modificar.
-* listNotes(user: string): Muestra todas las notas de un determinado usuario, haciendo uso de una lectura de directorios sincrona. Antes comprueba que dicho usuario tenga alguna nota.
-* readNote(note: string): Lee una nota, mostrándola en su color con chalk. Gestiona los errores si la nota no existe.
-* noteToJSON(note: Note): Convierte un archivo de la clase Note a un JSON, haciendo uso de la función JSON.stringlify.
-* JSONtoNote(jsonnote: string): Convierte un archivo JSON a un objeto de la clase Note. Usa la función JSON.parse con algunas adaptaciones de formato.
-* checkUserDirectory(username: string): Comprueba de forma síncrona que exista el directorio del usuario para almacenar notas. De no ser así, lo genera.
-* checkIfFileExist(route: string): Comprueba de forma síncrona si ya existe una nota
+* countFunctions.ts: Allí se encuentran las funciones para contar los elementos, tanto haciendo uso del pipe como sin él.
+* initializeYargs.ts: Función encargada de controlar los parámetros recibidos y llamar a las funciones correspondientes.
+* index.ts: Programa principal. Únicamente hace una llamada a initializeYargs
+* text-examples: Directorio que contiene algunos archivos de prueba.
 
-Esta clase hace uso principalmente de la libreria fs y de la clase Note.
+A continuación, se explicará un poco más en detalle cada una de las dos funciones de conteo de elementos:
+
+### Función countWithoutPipe
+
+Esta función, como su nombre indica, cuenta los elementos sin hacer uso del Pipe. Para ello, hace uso del comando spawn:
+
+```typescript
+const count = spawn('wc', [filename]);
+```
+
+A través de la propiedad stdout, se leen los datos obtenidos de spawn, y se va almacenando su contenido en una variable output:
+
+```typescript
+count.stdout.on('data', (element) => {
+    output += element;
+});
+```
+
+Finalmente, en el close, se crea un array donde se almacenan los elementos de output ya contados y separados, y se muestran los solicitados por el usuario:
+
+```typescript
+count.on('close', () => {
+    const countArray = output.split(/\s+/);
+    console.log(chalk.green(`Counting elements from ${filename}...\n\n`  
+                + (lines ? `Number of lines: ${parseInt(countArray[1]) + 1}\n` : "") 
+                + (words ? `Number of words: ${countArray[2]}\n` : "")
+                + (characters ? `Number of characters: ${countArray[3]}\n` : "")));
+})
+```
+
+### Función countWithPipe
+
+Esta función tiene prácticamente el mismo comportamiento, pero con algunas variaciones para hacer uso del pipe. 
+En lugar de usar un único spawn, se genera uno para cada elemento que se desee contar, usando el argumento correspondiente del comando wc.
+
+Además, para indicar el tipo que se va a imprimir(por ejemplo, "Numero de lineas"), se genera otro proceso hijo con un comando echo.
+Esto se hace para evitar que las líneas de salida se desordenen al tener el programa principal a la vez que el programa hijo haciendo uso de la consola de salida.
+
+Por ejemplo, esto se haría para imprimir el número de líneas:
+
+```typescript
+if(lines) {
+    var output = spawn('echo', ["-n", "Number of lines: "]);
+    output.stdout.pipe(process.stdout);
+    count = spawn('sh', ['-c',  `wc -l < ${filename}`])
+    count.stdout.pipe(process.stdout);
+}
+```
+
+Al pedir varios elementos, se obtiene la siguiente salida con el fichero ex4.txt:
+
+_Number of lines: 6_
+_Number of words: 21_
+_Number of characters: 125_
+
+Si se usara un console.log en lugar del primer echo, la salida sería la siguiente:
+
+_Number of lines:_
+_Number of words:_
+_Number of characters:_
+_6_
+_21_
+_125_
 
 * * *
 
-## Clase Note
+## Ejercicio 3
 
-Documentación de typedoc accesible desde [aquí.](typedoc/modules/note.html)
+Este ejercicio se basa en la práctica anterior. Trata de observar los cambios producidos al directorio de un usuario que esta usando la aplicaciçon de notas. Para ello, se debe usar la función watch.
 
-Clase encargada de almacenar de forma temporal las notas, y facilita el paso de parámetros y las lecturas.
-Cuenta con 5 atributos, que son los que pueden recibirse desde la línea de comandos más la ruta donde se almacena en el sistema de archivos:
+Para resolver este ejercicio, se ha creado la función _watchUserNotes_ encargada de vigilar el directorio que recibe por parámetro.
 
-* title
-* body
-* user
-* color
-* route
+Lo que hace esta función es:
 
-Cuenta con los métodos get y set para cada uno de esos atributos.
+* Comprobar que exista la ruta
+* Declarar dos variables booleanas
+* Comprobar que esa ruta sea un directorio
+* Leer el directorio, y lanzar error si no lo consigue
+* Entrar en modo de escucha con la función watch
 
-* * *
+Una vez dentro del modo de escucha, se lee nuevamente el directorio. Si se detecta algún evento, se entra al condicional del tipo de evento correspondiente.
 
-## Principales problemas encontrados
+1. Si es de tipo rename, se comprueba la cantidad de ficheros leidos. Según el tipo de cambio, se indicará si se ha eliminado o añadido un fichero
+2. Si es de tipo change, se comprueban las variables que se habían declarado previamente y se van cambiando en el flujo del programa. Si se detecta que efectivamente se ha modificado la nota, y no se ha añadido alguna o ha habido algún otro tipo de cambio, se muestra el mensaje correspondiente. Además, debido a la inestabilidad de la función watch, se hace uso de un setTimeout de 1 segundo antes de la siguiente llamda. Esto evita que el programa mande el mensaje de modificación dos veces ante un solo cambio, algo bastante habitual con esta función.
 
-Al incorporar varias funcionalidades nuevas, esta práctica ha generado varios problemas que han presentado dificultades a la hora de resolverse.
-
-1. En un principio, la funcion initializeYargs estaba en la misma clase ProgramFlowHandler. Sin embargo, esto generaba varios problemas de cumplimiento de los principios SOLID. Además, se podían generar errores al acceder a los atributos de la clase desde los handler de yargs.
-
-2. Los test de las funciones asíncronas también generaban muchos errores. Además, aquellos que no retornaban valores o generaban ficheros nuevos, como listNote() eran bastante complejos de testar con únicamente mocha y chai. Por ello, se ha añadido el paquete "sinon" para analizar las salidas de la consola y detectar errores o confirmaciones de forma automática.
+Esto se va repitiendo hasta que se cierra el programa.
 
 * * *
 
-## Integración continua con Github Actions
+## Ejercicio 4
 
-Para esta práctica se ha configurado una GitHub Action encargada de llevar a cabo la integración continua del código. Para ello, se ha creado la acción de CI en NodeJS en el repositorio de GitHub. Se ha añadido, además, un fichero llamado **node.js.yml** en el directorio **.github/workflows**, encargado de gestionar la acción.
+Este ejercicio pide crear un wrapper para algunos comandos de unix de gestión de ficheros, haciendo uso de yargs y fs.
 
-Se ha añadido la insignia correspondiente al README del repositorio y a este informe.
+Se han implementado los siguientes comandos:
 
-* * *
+### ls
 
-## Cubrimiento del código con coveralls
+El comando ls de este programa funciona de forma muy similar al de las distribuciones linux. Si recibe un parametro --path mediante yargs, muestra los ficheros de dicha ruta. Si no es así, muestra los del directorio actual del usuario.
 
-El código tiene pruebas mediante TDD realizadas con mocha y chai, y cubrimiento con Istanbul (nyc). Haciendo uso de una Github Action y de la web coveralls, se recopila la información de cubrimiento en formato lcov y se envía a coveralls, pudiendo acceder a información al respecto.
+Para ello hace uso de la función readdirSync.
 
-El porcentaje de cubrimiento total es bajo ya que las líneas de control de errores de los bloques catch no son comprobadas para evitar hacer fallar otros test. Sin embargo, el cubrimiento de las funciones es del 100%.
+### mkdir
 
-Además, se añade una insignia a la documentación, indicando el porcentaje de código cubierto.
+Este comando es muy sencillo. Comprueba si existe el directorio con existsSync, y si no es así, lo crea con mkdirSync.
+
+### cat
+
+Comprueba primero que la ruta exista, y que además no sea un directorio. De ser así, usa la función readFile de fs para mostrar su contenido.
+En caso de tratarse de un directorio, el comando avisa de esto, y de que usará ls en su lugar, mostrando los archivos del directorio.
+
+### rm
+
+Para este comando se ha hecho uso de spawn, creando un proceso hijo encargado de eliminar el fichero/directorio con rm -rf.
+Esto sólo se hará si el fichero/directorio existe.
+
+### copy/move
+
+El comando copy incluye también move. Lo que hace este comando es comprobar si existe la ruta de origen src. Una vez hecho esto, pueden pasar varias cosas según los parámetros recibidos mediante yargs.
+
+* Si solo recibe los parámetros obligatorios, sólo se hará la copia si no existe nada en la carpeta de destino. En caso contrario, avisará de que el directorio ya existe, y de cómo hacer para sobreescribirlo.
+* Si recibe el parámetro overwrite, hará la copia independientemente de si la carpeta destino existe o no, sobreescribiendola si fuera necesario.
+* Si recibe el parámetro move, eliminará la carpeta de origen una vez se haya terminado la copia, y únicamente si esta se realiza correctamente.
 
 * * *
 
@@ -182,6 +230,4 @@ El último paso consiste en implementar GitHub Pages desde el repositorio. Para 
 
 ## Conclusiones
 
-El uso de estas herramientas como Sonarcloud y coveralls ayuda bastante a controlar si el código está realmente listo para producción o no. Además, la infraestructura de desarrollo de Node está preparada para facilitar en gran medida el uso de toda clase de herramientas externas que ayudan mucho en estos aspectos.
-
-Pese a que Javascript y Typescript son lenguajes más bien orientados a la interactividad web, estos usos en el backend son cada vez más frecuentes, y a medida que sigan apareciendo herramientas y entornos como estos, probablemente acabarán tomando todo el terreno de otros lenguajes y sistemas como PHP.
+Pese a que Javascript y Typescript son lenguajes más bien orientados a la interactividad web, estos usos en el backend son cada vez más frecuentes, y a medida que sigan apareciendo herramientas y entornos como estos, probablemente acabarán tomando todo el terreno de otros lenguajes y sistemas como PHP. Además, la posibilidad de usar comandos del sistema desde Node facilita enormemente trabajar con ficheros, así como el uso de todo tipo de funcionalidades avanzadas mucho más complejas de programar de forma manual.

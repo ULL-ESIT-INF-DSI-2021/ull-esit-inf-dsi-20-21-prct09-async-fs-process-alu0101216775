@@ -38,7 +38,6 @@ export function InitializeYargsCommands(): void {
         },
         handler(argv) {
             if(typeof argv.filename === 'string') {
-                console.log("in");
                 let lines: boolean = false, words: boolean = false, characters: boolean = false, usePipe: boolean = false, filename: string = argv.filename;
                 if(argv.lines == true) lines = true;
                 if(argv.words == true) words = true;

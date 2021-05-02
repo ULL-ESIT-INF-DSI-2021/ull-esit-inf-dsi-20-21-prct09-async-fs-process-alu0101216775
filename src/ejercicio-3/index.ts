@@ -8,7 +8,7 @@ function watchUserNotes(user: string, path: string) {
             console.error(chalk.red("It was not possible to access to the user directory. Maybe it does not exist."));
         } else {
             let noteModified: boolean = true, noteAdded: boolean = false;
-            var fsTimeout: unknown = setTimeout(function() { fsTimeout=null }, 1000);
+            var fsTimeout: unknown = setTimeout(function() { fsTimeout=null }, 50);
             if(fs.lstatSync(path).isDirectory()) {
                 fs.readdir(path, (err, listOfFiles) => {
                     if(err) {
